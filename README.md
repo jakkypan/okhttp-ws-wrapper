@@ -63,7 +63,8 @@ PS：上面的流程可以看`OKHttpClient`类中的`newWebSocket()`方法。
 
 ## okhttp-ws里的源码分析
 
-###connect
+### connect
+
 连接的建立是客户端调用`OkHttpClient`里的`newWebSocket()`方法：
 
 ```java
@@ -76,7 +77,7 @@ PS：上面的流程可以看`OKHttpClient`类中的`newWebSocket()`方法。
 
 更细节的过程是（代码都是在`RealWebSocket`中）：
 
-####1. 客户端生成`Sec-WebSocket-Key`
+#### 1. 客户端生成`Sec-WebSocket-Key`
 
 ```java
 byte[] nonce = new byte[16];
@@ -84,7 +85,8 @@ random.nextBytes(nonce);
 this.key = ByteString.of(nonce).base64();
 ```
 
-####2. 构建特殊的请求
+#### 2. 构建特殊的请求
+
 如上面所述，WS的连接请求时比较特殊的
 
 ```java
@@ -124,7 +126,8 @@ public Builder url(String url) {
 
 所以可以看出WS虽然是全新的协议，但是还是和HTTP有一定的关系；同时在进行WS通信时，不一定要使用`ws://`或`wss://`。
 
-####3. 接收到响应-格式检查
+#### 3. 接收到响应-格式检查
+
 如上所述，响应也是必须满足一定格式，所以第一步就是格式的检查
 
 ```java
@@ -156,14 +159,15 @@ void checkResponse(Response response) throws ProtocolException {
   }
 ```
 
-####4. 接收到响应-WS数据收发的准备工作
+#### 4. 接收到响应-WS数据收发的准备工作
+
 这里主要是初始化输入输出的Source和Sink对象。
 
 
 
-####5. 回调onOPen()方法
+#### 5. 回调onOPen()方法
 
-####6. 初始化消息操作的Reader和Writer
+#### 6. 初始化消息操作的Reader和Writer
 
 即初始化`WebSocketReader`和`WebSocketWriter`对象。在发送数据时将数据组织成帧，在接收数据时解析帧，同时处理WS的控制消息。
 
@@ -199,7 +203,7 @@ PS: 注意，这里会有个定时的ping事件。
 streamAllocation.connection().socket().setSoTimeout(0);
 ```
 
-####8. 进入消息循环读取
+#### 8. 进入消息循环读取
 
 ```java
 public void loopReader() throws IOException {
@@ -210,7 +214,8 @@ public void loopReader() throws IOException {
   }
 ```
 
-###read
+### read
+
 上面详述了整个的WS连接建立的过程，那数据是怎么读取的呢？
 
 首先接着上面的`processNextFrame()`：
@@ -296,7 +301,8 @@ private void readMessageFrame() throws IOException {
   }
 ```
 
-###write/send
+### write/send
+
 数据的发送主要是调用`WebSocket`接口里定义的`send(*)`方法，它的实现是在`RealWebSocket`。
 
 ```java
@@ -425,7 +431,7 @@ synchronized boolean close(int code, String reason, long cancelAfterCloseMillis)
 
 关闭的具体流程：
 
-####1. Close code的有效性的检查
+#### 1. Close code的有效性的检查
 
 ```java
 static String closeCodeExceptionMessage(int code) {
@@ -439,7 +445,8 @@ static String closeCodeExceptionMessage(int code) {
   }
 ```
 
-####2. 构造Close消息
+#### 2. 构造Close消息
+
 构造Close消息，并加入到messageAndCloseQueue队列里，同时出发`runWriter()`。close消息可以带不超出123字节的字符串，以作为 Close message，来说明连接关闭的原因。
 
 ```java
@@ -480,7 +487,8 @@ try {
 }
 ```
 
-##WS交互的整个生命周期
+## WS交互的整个生命周期
+
 1. 连接通过一个HTTP请求握手并建立连接。WebSocket 连接可以理解为是通过HTTP请求建立的普通TCP连接。
 2. WebSocket 做了二进制分帧。WebSocket 连接中收发的数据以帧为单位。主要有用于连接保活的控制帧 PING 和 PONG，用于用户数据发送的 MESSAGE 帧，和用于关闭连接的控制帧 CLOSE。
 3. 连接建立之后，通过 PING 帧和 PONG 帧做连接保活。
