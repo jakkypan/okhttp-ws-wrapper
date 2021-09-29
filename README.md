@@ -31,9 +31,9 @@ WS是独立的基于TCP协议的新的协议，它是全双工的工作方式。
  * 必须包含头部`Connection`，且值必须是Upgrade
  * 必须包含头部`Upgrade`，且值必须是websocket
  * 必须包含头部`Sec-WebSocket-Accept`，它的值是通过如下算法计算得来：
-  		* 将客户端头中的`Sec-WebSocket-Key`值和固定的字符串`258EAFA5-E914-47DA-95CA-C5AB0DC85B11`拼接起来
-  		* 对拼接后的字符串进行一次SHA-1计算
-  		* 将计算结果进行Base-64编码
+   * 将客户端头中的`Sec-WebSocket-Key`值和固定的字符串`258EAFA5-E914-47DA-95CA-C5AB0DC85B11`拼接起来
+  	* 对拼接后的字符串进行一次SHA-1计算
+  	* 将计算结果进行Base-64编码
 3. 客户端在接收到服务端的返回，会对报文格式进行校验。任何一步的失败都将不能建立WS连接
 
 PS：上面的流程可以看`OKHttpClient`类中的`newWebSocket()`方法。
